@@ -14,7 +14,7 @@ const config = {
     defaultLocale: "en",
   },
   images: {
-    domains: ["dodopizza-a.akamaihd.net"],
+    domains: ["dodopizza.azureedge.net"],
   }
 };
 export default config;
