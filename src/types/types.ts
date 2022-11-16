@@ -17,3 +17,11 @@ export interface CartItem {
   size: number;
   type: number;
 }
+
+export type CartPizzaModel = {
+  pizza: PizzaModel;
+  price: number;
+  quantity: number;
+  dough: number;
+  size: number;
+};

@@ -1,28 +1,18 @@
+import Header from "@/components/header";
 import PizzaCard from "@/components/pizza-card";
-import { CartItem, PizzaModel } from "@/types/types";
+import { useAppDispatch } from "@/hooks/redux";
+import { PizzaModel } from "@/types/types";
 import { client } from "@/utils/pocketbase";
 import type { GetStaticProps } from "next";
 import { type NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
-import CartIcon from "public/svg/cart.svg";
-import PizzaLogo from "public/svg/pizza-logo.svg";
-import { useEffect, useState } from "react";
 
 export interface HomeProps {
   pizzas: PizzaModel[];
 }
 
 const Home: NextPage<HomeProps> = (props) => {
-  const [pizzaCart, setPizzaCart] = useState<CartItem[]>([]);
-
-  const onAddPizza = (pizza: CartItem) => {
-    setPizzaCart((prevState) => [...prevState, pizza]);
-  };
-
-  useEffect(() => {
-    console.log(pizzaCart);
-  }, [pizzaCart]);
+  const dispatch = useAppDispatch();
 
   return (
     <>
@@ -32,25 +22,7 @@ const Home: NextPage<HomeProps> = (props) => {
       </Head>
 
       <div className="wrapper">
-        <div className="header">
-          <div className="container">
-            <div className="header__logo">
-              <Image width="38" src={PizzaLogo} alt="Pizza logo" />
-              <div>
-                <h1>React Pizza</h1>
-                <p>самая вкусная пицца во вселенной</p>
-              </div>
-            </div>
-            <div className="header__cart">
-              <a href="/cart.html" className="button button--cart">
-                <span>520 ₽</span>
-                <div className="button__delimiter"></div>
-                <Image src={CartIcon} alt="Cart icon" />
-                <span>3</span>
-              </a>
-            </div>
-          </div>
-        </div>
+        <Header />
         <div className="content">
           <div className="container">
             <div className="content__top">
@@ -93,11 +65,7 @@ const Home: NextPage<HomeProps> = (props) => {
             <h2 className="content__title">Все пиццы</h2>
             <div className="content__items">
               {props.pizzas.map((pizza) => (
-                <PizzaCard
-                  pizza={pizza}
-                  onAddPizza={onAddPizza}
-                  key={pizza.id}
-                />
+                <PizzaCard pizza={pizza} key={pizza.id} />
               ))}
             </div>
           </div>
