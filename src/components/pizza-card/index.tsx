@@ -1,13 +1,14 @@
+import { useAppDispatch } from "@/hooks/redux";
+import { addItem } from "@/store/cart";
 import { CartItem, PizzaModel } from "@/types/types";
 import clsx from "clsx";
 import Image from "next/image";
 import Plus from "public/svg/plus.svg";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import type { FC } from "react";
 
 export interface PizzaCardProps {
   pizza: PizzaModel;
-  onAddPizza: (pizza: CartItem) => void;
 }
 
 const SizeToCostMultiplier = new Map<number, number>([
@@ -16,25 +17,33 @@ const SizeToCostMultiplier = new Map<number, number>([
   [40, 1.8],
 ]);
 
-const PizzaCard: FC<PizzaCardProps> = ({ pizza, onAddPizza }) => {
+const PizzaCard: FC<PizzaCardProps> = ({ pizza }) => {
   const [activeDough, setActiveDough] = useState(pizza.types[0]);
   const [activeSize, setActiveSize] = useState(pizza.sizes[0]);
+  const [activeCount, setActiveCount] = useState(1);
+  const dispatch = useAppDispatch();
 
   const pizzaCost = useMemo(() => {
     // @ts-ignore
     return Math.floor(pizza.price * SizeToCostMultiplier.get(activeSize));
   }, [activeSize, pizza.price]);
 
-  const handleAddPizza = () => {
-    onAddPizza({
-      id: pizza.id,
-      imageUrl: pizza.imageUrl,
-      name: pizza.name,
-      // @ts-ignore
-      size: activeSize,
-      dough: activeDough,
-      cost: pizzaCost,
-    });
+  const onAddToCart = () => {
+    dispatch(
+      addItem({
+        pizza,
+        price: pizzaCost,
+        dough: activeDough,
+        size: activeSize,
+        quantity: activeCount,
+      })
+    );
+  };
+
+  // TODO: Fix event propagation
+  const handleIncreaseQnt = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    setActiveCount((prev) => prev + 1);
   };
 
   return (
@@ -88,11 +97,15 @@ const PizzaCard: FC<PizzaCardProps> = ({ pizza, onAddPizza }) => {
         <div className="pizza-block__price">{`${pizzaCost} ₽`}</div>
         <div
           className="button button--outline button--add"
-          onClick={handleAddPizza}
+          onClick={onAddToCart}
         >
-          <Image src={Plus} alt="plus icon" />
+          <Image
+            src={Plus}
+            alt="plus icon"
+            onClick={() => setActiveCount((prev) => prev + 1)}
+          />
           <span>Добавить</span>
-          <i>2</i>
+          <i>{activeCount}</i>
         </div>
       </div>
     </div>
